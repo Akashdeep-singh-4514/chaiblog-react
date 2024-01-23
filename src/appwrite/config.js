@@ -1,29 +1,41 @@
-import conf from "../confs/conf";
-import { Client, ID, Storage, Query, Databases } from 'appwrite'
-
+import conf from '../conf/conf.js';
+import { Client, ID, Databases, Storage, Query } from "appwrite";
 
 export class Service {
-    client = new Client()
-    database;
+    client = new Client();
+    databases;
     bucket;
+
     constructor() {
         this.client
             .setEndpoint(conf.appwriteUrl)
-            .setProject(conf.appwriteProjectId)
-        this.database = new Databases(this.client)
-        this.bucket = new Storage(this.client)
+            .setProject(conf.appwriteProjectId);
+        this.databases = new Databases(this.client);
+        this.bucket = new Storage(this.client);
     }
-    async createPost({ title, status, slug, content, featureImage, userId, date }) {
-        try {
-            return await this.database.createDocument(conf.appwriteDatabaseId, conf.appwriteCollectionId, slug, { title, content, featureImage, userId, status })
 
+    async createPost({ title, slug, content, featuredImage, status, userId }) {
+        try {
+            return await this.databases.createDocument(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
+                slug,
+                {
+                    title,
+                    content,
+                    featuredImage,
+                    status,
+                    userId,
+                }
+            )
         } catch (error) {
             console.log("Appwrite serive :: createPost :: error", error);
         }
     }
-    async updatePost(slug, { title, content, featuredImage, status, date }) {
+
+    async updatePost(slug, { title, content, featuredImage, status }) {
         try {
-            return await this.database.updateDocument(
+            return await this.databases.updateDocument(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionId,
                 slug,
@@ -39,9 +51,10 @@ export class Service {
             console.log("Appwrite serive :: updatePost :: error", error);
         }
     }
+
     async deletePost(slug) {
         try {
-            await this.database.deleteDocument(
+            await this.databases.deleteDocument(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionId,
                 slug
@@ -56,7 +69,7 @@ export class Service {
 
     async getPost(slug) {
         try {
-            return await this.database.getDocument(
+            return await this.databases.getDocument(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionId,
                 slug
@@ -70,7 +83,7 @@ export class Service {
 
     async getPosts(queries = [Query.equal("status", "active")]) {
         try {
-            return await this.database.listDocuments(
+            return await this.databases.listDocuments(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionId,
                 queries,
@@ -117,10 +130,8 @@ export class Service {
             fileId
         )
     }
-
-
-
 }
+
 
 const service = new Service()
 export default service
