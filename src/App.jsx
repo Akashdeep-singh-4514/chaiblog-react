@@ -35,7 +35,7 @@ function App() {
       </div>
     </div>
   ) : (
-    <h1>!success</h1>
+    <h1>loading</h1>
   );
 }
 
